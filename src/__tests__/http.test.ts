@@ -1,20 +1,26 @@
 import { afterEach, describe, expect, it } from "vitest";
 
 import { once } from "node:events";
+import type { Server } from "node:http";
 import type { AddressInfo } from "node:net";
 
 import { loadConfig } from "../config.js";
 import { createMcpHttpApp } from "../http.js";
 
-const servers: Array<{ close: () => void }> = [];
+const servers: Server[] = [];
 
 afterEach(async () => {
   await Promise.all(
     servers.splice(0).map(
       (server) =>
-        new Promise<void>((resolve) => {
-          server.close();
-          resolve();
+        new Promise<void>((resolve, reject) => {
+          server.close((error) => {
+            if (error) {
+              reject(error);
+              return;
+            }
+            resolve();
+          });
         })
     )
   );
@@ -61,6 +67,26 @@ describe("http transport", () => {
     });
 
     expect(response.status).toBe(401);
+  });
+
+  it("does not leak the expected bearer token on invalid auth", async () => {
+    const expectedToken = "0123456789abcdef0123456789abcdef";
+    const config = loadConfig([], {
+      CAMOFOX_TRANSPORT: "http",
+      CAMOFOX_HTTP_API_KEY: expectedToken
+    } as NodeJS.ProcessEnv);
+    const baseUrl = await listen(createMcpHttpApp(config));
+
+    const response = await fetch(`${baseUrl}/mcp`, {
+      method: "GET",
+      headers: { authorization: "Bearer wrong-token" }
+    });
+
+    expect(response.status).toBe(401);
+    const authenticateHeader = response.headers.get("www-authenticate") ?? "";
+    const body = await response.text();
+    expect(authenticateHeader).not.toContain(expectedToken);
+    expect(body).not.toContain(expectedToken);
   });
 
   it("allows bearer-authenticated unsupported methods to reach method handling", async () => {
