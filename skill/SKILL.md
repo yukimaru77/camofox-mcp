@@ -1,8 +1,8 @@
 ---
 name: skill
 title: CamoFox MCP for OpenClaw
-version: 1.13.2
-description: Anti-detection browser automation MCP skill for OpenClaw agents with 46 tools for navigation, interaction, observation, extraction, downloads, profiles, sessions, and stealth web search.
+version: 1.14.0
+description: Anti-detection browser automation MCP skill for OpenClaw agents with 47 tools for navigation, interaction, observation, extraction, downloads, profiles, sessions, and stealth web search.
 author: redf0x1
 tags:
   - mcp
@@ -16,7 +16,7 @@ license: MIT
 homepage: https://github.com/redf0x1/camofox-mcp#readme
 metadata:
   title: CamoFox MCP for OpenClaw
-  version: 1.13.2
+  version: 1.14.0
   author: redf0x1
   tags:
     - mcp
@@ -52,15 +52,15 @@ CamoFox Browser must be running first (default `http://localhost:9377`).
 ### 2) Start CamoFox MCP in HTTP mode
 
 ```bash
-CAMOFOX_TRANSPORT=http npx camofox-mcp@1.13.2
+CAMOFOX_TRANSPORT=http npx camofox-mcp@1.14.0
 ```
 
 Optional examples:
 
 ```bash
-CAMOFOX_TRANSPORT=http CAMOFOX_API_KEY=browser-server-key npx camofox-mcp@1.13.2
-CAMOFOX_TRANSPORT=http CAMOFOX_HTTP_HOST=0.0.0.0 CAMOFOX_HTTP_API_KEY=replace-with-32-plus-random-chars npx camofox-mcp@1.13.2
-CAMOFOX_TRANSPORT=http CAMOFOX_HTTP_PORT=8080 npx camofox-mcp@1.13.2
+CAMOFOX_TRANSPORT=http CAMOFOX_API_KEY=browser-server-key npx camofox-mcp@1.14.0
+CAMOFOX_TRANSPORT=http CAMOFOX_HTTP_HOST=0.0.0.0 CAMOFOX_HTTP_API_KEY=replace-with-32-plus-random-chars npx camofox-mcp@1.14.0
+CAMOFOX_TRANSPORT=http CAMOFOX_HTTP_PORT=8080 npx camofox-mcp@1.14.0
 ```
 
 ### 3) Configure OpenClaw
@@ -96,7 +96,7 @@ Use this skill when the user asks for tasks like:
 - “Run web search in browser and summarize results”
 - “Download files and return metadata/content”
 
-## Tool catalog (46 tools)
+## Tool catalog (47 tools)
 
 ### Health (1)
 
@@ -104,7 +104,7 @@ Use this skill when the user asks for tasks like:
 
 ### Tabs (3)
 
-- `create_tab` — Create a new browser tab with anti-detection fingerprinting. Each tab gets a unique fingerprint. Optionally provide a URL and userId for session isolation. Returns the tab ID for subsequent operations.
+- `create_tab` — Create a new browser tab with anti-detection fingerprinting. Supports URL, user/session isolation, geo overrides, proxyProfile/raw proxy, and geoMode. Returns the tab ID for subsequent operations.
 - `close_tab` — Close a browser tab and release resources. Always close tabs when done to free memory.
 - `list_tabs` — List all open browser tabs with URLs and titles. Use to discover available tabs or verify tab state.
 
@@ -143,9 +143,10 @@ Use this skill when the user asks for tasks like:
 - `get_download` — Get a downloaded file. Images are always returned as viewable images. Recommended for AI agents: set includeContent=true to get non-image file content as base64 inline (max 256KB). Otherwise returns metadata only (including contentUrl).
 - `delete_download` — Delete a downloaded file from disk and registry.
 
-### Extraction (3)
+### Extraction (4)
 
 - `extract_resources` — Extract resources (images, links, media, documents) from a specific DOM container. Use a CSS selector or element ref from snapshot to scope extraction to a particular section of the page. This is useful for extracting all images from a specific post, all links from a table, etc.
+- `extract_structured` — Extract deterministic structured JSON from a page using the camofox-browser structured extraction schema.
 - `batch_download` — Extract resources from a DOM container and download them all. Combines extract_resources + download in one call. Useful for downloading all images from a chat, all PDFs from a table, etc.
 - `resolve_blobs` — Resolve blob: URLs to downloadable base64 data. Blob URLs are temporary browser objects (common in Telegram, WhatsApp, Discord) that cannot be downloaded directly. This tool converts them to base64 data URIs.
 
@@ -183,7 +184,7 @@ Use this skill when the user asks for tasks like:
 ## What makes CamoFox unique
 
 - Stealth-first architecture for AI agents that need reliability on hostile sites
-- Rich tool surface (46 tools) combining low-level controls + high-level workflows
+- Rich tool surface (47 tools) combining low-level controls + high-level workflows
 - Snapshot-first design that reduces token burn while preserving actionable context
 - Built-in profile/session controls for long-running authenticated automations
 - Native HTTP MCP endpoint for OpenClaw and remote MCP-compatible clients

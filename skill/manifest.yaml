@@ -1,5 +1,5 @@
 name: camofox-mcp
-version: 1.13.2
+version: 1.14.0
 description: Anti-detection browser MCP server for AI agents — navigate, interact, and automate the web without getting blocked
 author: redf0x1
 license: MIT
@@ -25,14 +25,14 @@ prerequisites:
     description: CamoFox Browser server must be running (default http://localhost:9377)
   - name: Start command
     required: true
-    description: Start MCP server in HTTP mode with CAMOFOX_TRANSPORT=http npx camofox-mcp@1.13.2
+    description: Start MCP server in HTTP mode with CAMOFOX_TRANSPORT=http npx camofox-mcp@1.14.0
 
 tools:
   - name: server_status
     description: Check CamoFox server health and browser connection.
 
   - name: create_tab
-    description: Create a new anti-detection browser tab with optional URL and session settings.
+    description: Create a new anti-detection browser tab with optional URL, session, proxy, and geo settings.
   - name: close_tab
     description: Close a browser tab and release resources.
   - name: list_tabs
@@ -90,6 +90,8 @@ tools:
 
   - name: extract_resources
     description: Extract images, links, media, and documents from a DOM scope.
+  - name: extract_structured
+    description: Extract deterministic structured JSON with a browser-side extraction schema.
   - name: batch_download
     description: Extract and download scoped resources in one call.
   - name: resolve_blobs

@@ -157,6 +157,32 @@ describe("client", () => {
     });
   });
 
+  it("extractStructured posts schema to the browser structured extraction endpoint", async () => {
+    const client = new CamofoxClient(makeConfig());
+    const schema = {
+      kind: "object",
+      fields: {
+        title: { kind: "text", selector: "h1" }
+      }
+    };
+
+    const fetchMock = vi.fn((async (url: string, init?: RequestInit) => {
+      expect(url).toBe("http://test:9377/tabs/tab-1/extract-structured");
+      expect(init?.method).toBe("POST");
+      expect(JSON.parse(String(init?.body))).toEqual({
+        userId: "user-1",
+        schema
+      });
+      return new Response(JSON.stringify({ ok: true, data: { title: "Hello" } }), { status: 200 });
+    }) as typeof fetch);
+    globalThis.fetch = fetchMock;
+
+    await expect(client.extractStructured("tab-1", { userId: "user-1", schema })).resolves.toEqual({
+      ok: true,
+      data: { title: "Hello" }
+    });
+  });
+
   it("smartTypeText uses keystroke typing for short text", async () => {
     const client = new CamofoxClient(makeConfig());
     const shortText = "a".repeat(399);

@@ -6,7 +6,7 @@ CamoFox MCP connects MCP clients such as Claude Desktop, VS Code, Cursor, and Op
 
 ## Key Features
 
-- 46 browser automation tools across navigation, interaction, observation, search, downloads, sessions, and batch workflows.
+- 47 browser automation tools across navigation, interaction, observation, search, downloads, sessions, and batch workflows.
 - Anti-detection browser automation built on top of the CamoFox browser server and Camoufox.
 - Multi-tab workflows with tracked state, history, and cleanup.
 - Session persistence with cookie import, saved profiles, and optional auto-save.

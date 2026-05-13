@@ -1,21 +1,21 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-09-29/server.schema.json",
   "name": "camofox-mcp",
-  "description": "Anti-detection browser automation MCP server. 46 tools wrapping CamoFox REST API with stealth fingerprinting that passes bot detection.",
+  "description": "Anti-detection browser automation MCP server. 47 tools wrapping CamoFox REST API with stealth fingerprinting that passes bot detection.",
   "repository": {
     "url": "https://github.com/redf0x1/camofox-mcp",
     "source": "github"
   },
   "version_detail": {
-    "version": "1.13.2",
-    "release_date": "2026-05-12",
+    "version": "1.14.0",
+    "release_date": "2026-05-13",
     "is_stable": true
   },
   "packages": [
     {
       "registry_name": "npm",
       "name": "camofox-mcp",
-      "version": "1.13.2",
+      "version": "1.14.0",
       "runtime": "node",
       "runtime_arguments": [],
       "package_arguments": [],
@@ -95,11 +95,12 @@
     {"name": "camofox_wait_for_text", "description": "Wait for specific text to appear on the page. Useful for waiting for search results, form submissions, or dynamic content loading.", "inputSchema": {"type": "object", "properties": {"tabId": {"type": "string", "description": "Tab ID"}, "text": {"type": "string", "description": "Text to wait for"}, "timeout": {"type": "number", "description": "Timeout in ms (default: 10000)"}}, "required": ["tabId", "text"], "additionalProperties": false}},
     {"name": "click", "description": "Click an element. Provide either ref (from snapshot) or CSS selector. Use snapshot first to discover element refs."},
     {"name": "close_tab", "description": "Close a browser tab and release resources. Always close tabs when done to free memory."},
-    {"name": "create_tab", "description": "Create a new browser tab with anti-detection fingerprinting. Each tab gets a unique fingerprint. Optionally provide a URL and userId for session isolation. Returns the tab ID for subsequent operations."},
+    {"name": "create_tab", "description": "Create a new browser tab with anti-detection fingerprinting. Supports URL, user/session isolation, geo overrides, proxyProfile/raw proxy, and geoMode. Returns the tab ID for subsequent operations."},
     {"name": "delete_download", "description": "Delete a downloaded file from disk and registry"},
     {"name": "fill_form", "description": "Fill multiple form fields in one call. Provide an array of field entries, each with a ref or CSS selector and the text to type. Optionally specify a submit button to click after filling."},
     {"name": "batch_download", "description": "Extract resources from a DOM container and download them all. Combines extract_resources + download in one call. Useful for downloading all images from a chat, all PDFs from a table, etc."},
     {"name": "extract_resources", "description": "Extract resources (images, links, media, documents) from a specific DOM container. Use a CSS selector or element ref from snapshot to scope extraction to a particular section of the page. This is useful for extracting all images from a specific post, all links from a table, etc."},
+    {"name": "extract_structured", "description": "Extract deterministic structured JSON from a page using the camofox-browser structured extraction schema."},
     {"name": "get_download", "description": "Get a downloaded file. Images are always returned as viewable images. Recommended for AI agents: set includeContent=true to get non-image file content as base64 inline (max 256KB). Otherwise returns metadata only (including contentUrl)."},
     {"name": "get_links", "description": "Get all hyperlinks on page with URLs and text. Useful for navigation discovery and site mapping."},
     {"name": "get_stats", "description": "Get session statistics: request counts, active tabs, uptime, performance metrics."},

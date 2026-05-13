@@ -11,6 +11,19 @@ import type { TabInfo } from "../types.js";
 
 const AUTO_PROFILE_TIMEOUT_MS = 5_000;
 
+const rawProxySchema = z
+  .object({
+    host: z.string().min(1),
+    port: z.union([z.string().min(1), z.number().int().positive()]).transform(String),
+    username: z.string().min(1).optional(),
+    password: z.string().min(1).optional()
+  })
+  .describe("Raw proxy override. proxyProfile takes precedence when both are provided.");
+
+const geoModeSchema = z.enum(["explicit-wins", "proxy-locked"]).describe(
+  "Geo merge mode. explicit-wins keeps explicit locale/timezone/geolocation; proxy-locked requires proxy/profile geo values."
+);
+
 export function registerTabsTools(server: McpServer, deps: ToolDeps): void {
   server.tool(
     "create_tab",
@@ -18,6 +31,7 @@ export function registerTabsTools(server: McpServer, deps: ToolDeps): void {
     {
       url: z.string().url().optional().describe("Full URL including protocol (e.g. 'https://example.com')"),
       userId: z.string().min(1).optional().describe("User ID for session isolation"),
+      sessionKey: z.string().min(1).optional().describe("Session key for browser context reuse. Defaults to a new unique session."),
       preset: z.string().optional().describe(
         'Named geo preset (e.g. "us-east", "us-west", "japan", "uk", "germany", "vietnam", "singapore", "australia"). Sets locale, timezone, and geolocation.'
       ),
@@ -36,7 +50,10 @@ export function registerTabsTools(server: McpServer, deps: ToolDeps): void {
           height: z.number().int().min(240).max(2160)
         })
         .optional()
-        .describe("Browser viewport size override")
+        .describe("Browser viewport size override"),
+      proxyProfile: z.string().min(1).optional().describe("Named proxy profile configured in camofox-browser"),
+      proxy: rawProxySchema.optional(),
+      geoMode: geoModeSchema.optional()
     },
     async (input: unknown) => {
       try {
@@ -44,6 +61,7 @@ export function registerTabsTools(server: McpServer, deps: ToolDeps): void {
           .object({
             url: z.string().url().optional().describe("Full URL including protocol (e.g. 'https://example.com')"),
             userId: z.string().min(1).optional().describe("User ID for session isolation"),
+            sessionKey: z.string().min(1).optional().describe("Session key for browser context reuse. Defaults to a new unique session."),
             preset: z.string().optional().describe(
               'Named geo preset (e.g. "us-east", "us-west", "japan", "uk", "germany", "vietnam", "singapore", "australia"). Sets locale, timezone, and geolocation.'
             ),
@@ -59,15 +77,18 @@ export function registerTabsTools(server: McpServer, deps: ToolDeps): void {
             viewport: z
               .object({
                 width: z.number().int().min(320).max(3840),
-                height: z.number().int().min(240).max(2160)
-              })
-              .optional()
-              .describe("Browser viewport size override")
+                  height: z.number().int().min(240).max(2160)
+                })
+                .optional()
+                .describe("Browser viewport size override"),
+            proxyProfile: z.string().min(1).optional().describe("Named proxy profile configured in camofox-browser"),
+            proxy: rawProxySchema.optional(),
+            geoMode: geoModeSchema.optional()
           })
           .parse(input);
 
         const userId = parsed.userId ?? deps.config.defaultUserId;
-        const sessionKey = randomUUID();
+        const sessionKey = parsed.sessionKey ?? randomUUID();
         const tab = await deps.client.createTab({
           userId,
           sessionKey,
@@ -76,7 +97,10 @@ export function registerTabsTools(server: McpServer, deps: ToolDeps): void {
           locale: parsed.locale,
           timezoneId: parsed.timezoneId,
           geolocation: parsed.geolocation,
-          viewport: parsed.viewport
+          viewport: parsed.viewport,
+          proxyProfile: parsed.proxyProfile,
+          proxy: parsed.proxy,
+          geoMode: parsed.geoMode
         });
 
         const tracked: TabInfo = {

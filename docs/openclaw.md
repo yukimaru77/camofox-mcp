@@ -71,9 +71,9 @@ Use MCPorter to bridge MCP servers to OpenClaw skills format.
 
 Enter `http://localhost:3000/mcp` as a custom MCP server URL in OpenClaw settings.
 
-## Available Tools (46)
+## Available Tools (47)
 
-CamoFox MCP provides 46 browser automation tools:
+CamoFox MCP provides 47 browser automation tools:
 
 ### Navigation
 - `navigate` — Navigate to URL
@@ -107,6 +107,7 @@ CamoFox MCP provides 46 browser automation tools:
 - `get_download` — Read download metadata and optional file content
 - `delete_download` — Delete downloaded file from disk and registry
 - `extract_resources` — Extract media/links/documents from a DOM scope
+- `extract_structured` — Extract deterministic JSON with a structured extraction schema
 - `batch_download` — Extract and download resources in one call
 - `resolve_blobs` — Resolve blob URLs to downloadable data
 

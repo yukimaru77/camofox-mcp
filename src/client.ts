@@ -820,6 +820,23 @@ export class CamofoxClient {
     );
   }
 
+  async extractStructured(
+    tabId: string,
+    params: {
+      userId: string;
+      schema: Record<string, unknown>;
+    }
+  ): Promise<any> {
+    return this.requestJson(
+      `/tabs/${encodeURIComponent(tabId)}/extract-structured`,
+      {
+        method: "POST",
+        body: JSON.stringify(params)
+      },
+      z.unknown()
+    );
+  }
+
   async batchDownload(
     tabId: string,
     params: {

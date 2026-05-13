@@ -22,6 +22,15 @@ export interface HealthResponse {
   activeOps?: number;
 }
 
+export type GeoMode = "explicit-wins" | "proxy-locked";
+
+export interface RawProxyOverride {
+  host: string;
+  port: string;
+  username?: string;
+  password?: string;
+}
+
 export interface CreateTabParams {
   userId: string;
   sessionKey: string;
@@ -31,6 +40,9 @@ export interface CreateTabParams {
   timezoneId?: string;
   geolocation?: { latitude: number; longitude: number };
   viewport?: { width: number; height: number };
+  proxyProfile?: string;
+  proxy?: RawProxyOverride;
+  geoMode?: GeoMode;
 }
 
 export interface PresetInfo {

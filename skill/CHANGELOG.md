@@ -2,6 +2,13 @@
 
 All notable changes to this ClawHub skill package will be documented in this file.
 
+## [1.14.0] - 2026-05-13
+
+- Updated package metadata from 1.13.2 to 1.14.0.
+- Updated the tool catalog from 46 to 47 tools.
+- Added `extract_structured` to match camofox-browser structured extraction.
+- Updated `create_tab` guidance for `sessionKey`, proxy, and geo overrides.
+
 ## [1.13.2] - 2026-05-12
 
 - Updated package metadata from 1.10.0 to 1.13.2.

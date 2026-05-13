@@ -1,5 +1,21 @@
 # Changelog
 
+## [1.14.0] - 2026-05-13
+
+### Added
+- `extract_structured` tool for camofox-browser structured extraction schemas.
+- `create_tab` support for browser session `proxyProfile`, raw `proxy`, `geoMode`, and optional `sessionKey` reuse.
+- HTTP auth boundary regression coverage to verify unauthenticated `/mcp` requests are rejected before MCP tool-server creation.
+
+### Compatibility
+- Pair with `camofox-browser` `2.4.2` or newer when sending both `proxyProfile` and raw `proxy`; `2.4.2` fixes the browser-side precedence contract so `proxyProfile` wins.
+
+### Changed
+- Public server metadata and skill docs now reflect 47 registered tools.
+
+### Security
+- Refreshed dev dependency lockfile entries so full `npm audit` reports zero vulnerabilities.
+
 ## [1.13.2] - 2026-05-12
 
 ### Added

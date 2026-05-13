@@ -2,22 +2,23 @@
 
 This page is the canonical index for the tools currently registered by `camofox-mcp`.
 
-> Note: older docs in this repo still mention 41 or 46 tools. The current source registers **46 tools across 12 categories**. This index follows the live source in `src/tools/` and `src/server.ts`.
+> Note: older release entries in this repo mention 41 or 46 tools. The current source registers **47 tools across 12 categories**. This index follows the live source in `src/tools/` and `src/server.ts`.
 
 ## Overview
 
-- Total tools: **46**
+- Total tools: **47**
 - Categories: **12**
 - Primary interaction model: `create_tab` -> `navigate` or `web_search` -> `snapshot` -> interact with refs or CSS selectors
 - Preferred read path: use `snapshot` first, then fall back to CSS-selector and DOM tools when refs are incomplete
 - API key note: tools marked `Yes` call browser-server endpoints that require `CAMOFOX_API_KEY` when the browser server is protected. HTTP transport exposure uses separate inbound `CAMOFOX_HTTP_API_KEY` Bearer authentication.
+- Compatibility note: use `camofox-browser` `2.4.2` or newer when sending both `proxyProfile` and raw `proxy`; that browser version fixes the precedence contract so `proxyProfile` wins.
 
 ## Quick Reference
 
 | Tool | Category | Description |
 | --- | --- | --- |
 | `server_status` | Health & Status | Check browser-server health, browser connection, and tracked tab count. |
-| `create_tab` | Tab Management | Open a new anti-detection browser tab, optionally preconfigured with URL, user, and geo settings. |
+| `create_tab` | Tab Management | Open a new anti-detection browser tab, optionally preconfigured with URL, user/session, proxy, and geo settings. |
 | `close_tab` | Tab Management | Close a tracked tab and optionally auto-save its session profile. |
 | `list_tabs` | Tab Management | List currently tracked tabs. |
 | `navigate` | Navigation | Navigate a tab to a URL and return the resolved page state. |
@@ -53,6 +54,7 @@ This page is the canonical index for the tools currently registered by `camofox-
 | `get_download` | Downloads | Return download metadata and optionally inline file content. |
 | `delete_download` | Downloads | Delete a downloaded file and registry entry. |
 | `extract_resources` | Content Extraction | Extract images, links, media, and documents from a container. |
+| `extract_structured` | Content Extraction | Extract deterministic structured JSON with a browser-side extraction schema. |
 | `batch_download` | Content Extraction | Extract and download matching resources in one operation. |
 | `resolve_blobs` | Content Extraction | Convert `blob:` URLs into downloadable data. |
 | `fill_form` | Batch Operations | Fill multiple fields and optionally submit the form. |
@@ -73,7 +75,7 @@ This page is the canonical index for the tools currently registered by `camofox-
 
 | Name | Description | Parameters | Returns | Requires API Key | Example |
 | --- | --- | --- | --- | --- | --- |
-| `create_tab` | Open a new anti-detection tab and start tracking it in MCP state. | `url?: string (URL)`; `userId?: string`; `preset?: string`; `locale?: string`; `timezoneId?: string`; `geolocation?: { latitude: number, longitude: number }`; `viewport?: { width: int, height: int }`. | `tabId`, `url`, `userId`, `sessionKey`, `preset`, `autoLoaded`. | No | `create_tab({ url: "https://example.com", preset: "us-east" })` |
+| `create_tab` | Open a new anti-detection tab and start tracking it in MCP state. | `url?: string (URL)`; `userId?: string`; `sessionKey?: string`; `preset?: string`; `locale?: string`; `timezoneId?: string`; `geolocation?: { latitude: number, longitude: number }`; `viewport?: { width: int, height: int }`; `proxyProfile?: string`; `proxy?: { host: string, port: string \| number, username?: string, password?: string }`; `geoMode?: "explicit-wins" \| "proxy-locked"`. | `tabId`, `url`, `userId`, `sessionKey`, `preset`, `autoLoaded`. | No | `create_tab({ url: "https://example.com", proxyProfile: "tokyo-exit", geoMode: "proxy-locked" })` |
 | `close_tab` | Close a tracked tab and remove it from local state. | `tabId: string`. | `success`, `tabId`, `autoSaved`, `autoSaveFailure?`. | No | `close_tab({ tabId: "tab_123" })` |
 | `list_tabs` | Show all tracked tabs known to MCP. | None. | Array of tracked tab records including `tabId`, `url`, `userId`, timestamps, counters, and session metadata. | No | `list_tabs({})` |
 
@@ -149,6 +151,7 @@ This page is the canonical index for the tools currently registered by `camofox-
 | Name | Description | Parameters | Returns | Requires API Key | Example |
 | --- | --- | --- | --- | --- | --- |
 | `extract_resources` | Extract images, links, media, or documents from a DOM container. | `tabId: string`; `userId?: string`; `selector?: string`; `ref?: string`; `types?: ("images" | "links" | "media" | "documents" | "image" | "link" | "document")[]`; `extensions?: string[]`; `resolveBlobs?: boolean` default `false`; `triggerLazyLoad?: boolean` default `false`; `maxDepth?: int` default `5`. One of `selector` or `ref` is required. | Extraction payload from the browser server, typically resource lists plus counts and status data. | No | `extract_resources({ tabId: "tab_123", selector: ".gallery", types: ["images"] })` |
+| `extract_structured` | Extract deterministic structured JSON from the page. | `tabId: string`; `userId?: string`; `schema: object` using the camofox-browser structured extraction DSL. | Browser structured extraction result, including `ok`, `data`, and metadata or validation errors from the browser server. | No | `extract_structured({ tabId: "tab_123", schema: { kind: "object", selector: "#catalog", fields: { title: { kind: "text", selector: "h1" } } } })` |
 | `batch_download` | Extract matching resources and download them immediately. | `tabId: string`; `userId?: string`; `selector?: string`; `ref?: string`; `types?: same enum array`; `extensions?: string[]`; `resolveBlobs?: boolean` default `true`; `concurrency?: int` default `5`; `maxFiles?: int` default `50`. One of `selector` or `ref` is required. | Batch download payload from the browser server, typically including queued, completed, failed, and download IDs. | No | `batch_download({ tabId: "tab_123", ref: "e21", types: ["documents"], extensions: ["pdf"] })` |
 | `resolve_blobs` | Resolve one or more `blob:` URLs to downloadable data URLs. | `tabId: string`; `userId?: string`; `urls: string[]` minimum length `1`. | Blob-resolution payload with resolved URLs and failure information when applicable. | No | `resolve_blobs({ tabId: "tab_123", urls: ["blob:https://site/..."] })` |
 

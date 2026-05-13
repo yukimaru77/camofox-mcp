@@ -122,6 +122,48 @@ describe("tools/tabs", () => {
       expect(tracked.userId).toBe("default");
     });
 
+    it("forwards browser session proxy and geo overrides", async () => {
+      deps.config.autoSave = false;
+      vi.mocked(deps.client.createTab).mockResolvedValue({ tabId: "tab-proxy", url: "http://example.com" });
+
+      const { server, getHandler } = makeServerCapture();
+      registerTabsTools(server as unknown as Parameters<typeof registerTabsTools>[0], deps);
+      const handler = getHandler("create_tab");
+
+      const result = await handler({
+        url: "http://example.com",
+        userId: "agent-1",
+        sessionKey: "reuse-key",
+        proxyProfile: "tokyo-exit",
+        proxy: {
+          host: "ignored.example.com",
+          port: "9999",
+          username: "alice",
+          password: "secret"
+        },
+        geoMode: "proxy-locked"
+      });
+
+      expect(result.isError).toBeFalsy();
+      const payload = parseToolTextJson(result);
+      expect(payload).toMatchObject({ tabId: "tab-proxy", userId: "agent-1", sessionKey: "reuse-key" });
+      expect(deps.client.createTab).toHaveBeenCalledWith(
+        expect.objectContaining({
+          userId: "agent-1",
+          sessionKey: "reuse-key",
+          proxyProfile: "tokyo-exit",
+          proxy: {
+            host: "ignored.example.com",
+            port: "9999",
+            username: "alice",
+            password: "secret"
+          },
+          geoMode: "proxy-locked"
+        })
+      );
+      expect(getTrackedTab("tab-proxy").sessionKey).toBe("reuse-key");
+    });
+
     it("create with auto-load succeeds (apiKey + autoSave)", async () => {
       deps.config.apiKey = "test-key";
       deps.config.autoSave = true;
