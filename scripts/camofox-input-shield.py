@@ -22,6 +22,22 @@ XAUTHORITY = os.environ.get("XAUTHORITY") or f"/run/user/{os.getuid()}/gdm/Xauth
 POLL_SECONDS = int(os.environ.get("CAMOFOX_INPUT_SHIELD_POLL_MS", "300")) / 1000
 
 
+def wmctrl_windows() -> list[tuple[str, str]]:
+    try:
+        lines = run_x(["wmctrl", "-lp"]).splitlines()
+    except Exception:
+        return []
+
+    windows: list[tuple[str, str]] = []
+    for line in lines:
+        parts = line.split(maxsplit=4)
+        if not parts:
+            continue
+        title = parts[4] if len(parts) >= 5 else ""
+        windows.append((parts[0], title))
+    return windows
+
+
 def run_x(args: list[str]) -> str:
     env = os.environ.copy()
     env["DISPLAY"] = DISPLAY
@@ -30,30 +46,37 @@ def run_x(args: list[str]) -> str:
 
 
 def find_camoufox_window() -> str | None:
-    try:
-        lines = run_x(["wmctrl", "-lp"]).splitlines()
-    except Exception:
-        return None
-
     matches: list[tuple[int, str]] = []
-    for index, line in enumerate(lines):
-        if "Camoufox" not in line and "camoufox" not in line:
+    for index, (window_id, title) in enumerate(wmctrl_windows()):
+        if "Camoufox" not in title and "camoufox" not in title:
             continue
-        parts = line.split(maxsplit=4)
-        if not parts:
-            continue
-        title = parts[4] if len(parts) >= 5 else ""
         score = index
         if "ChatGPT" in title:
             score += 40
         if "— Camoufox" in title or "- Camoufox" in title:
             score += 20
         if title.strip() == "Camoufox":
-            score += 10
-        matches.append((score, parts[0]))
+            score -= 100
+        matches.append((score, window_id))
     if not matches:
         return None
     return max(matches)[1]
+
+
+def minimize_blank_camoufox_windows() -> None:
+    has_content_window = any(
+        ("— Camoufox" in title or "- Camoufox" in title) and title.strip() != "Camoufox"
+        for _, title in wmctrl_windows()
+    )
+    if not has_content_window:
+        return
+
+    for window_id, title in wmctrl_windows():
+        if title.strip() == "Camoufox":
+            try:
+                run_x(["xdotool", "windowminimize", window_id])
+            except Exception:
+                pass
 
 
 def window_geometry(window_id: str) -> tuple[int, int, int, int] | None:
@@ -115,6 +138,7 @@ def main() -> int:
     last_geometry: tuple[int, int, int, int] | None = None
 
     while True:
+        minimize_blank_camoufox_windows()
         window_id = find_camoufox_window()
         geometry = window_geometry(window_id) if window_id else None
         if geometry is None:
