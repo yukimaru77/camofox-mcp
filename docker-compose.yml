@@ -1,8 +1,21 @@
 services:
   camofox-browser:
     image: ghcr.io/redf0x1/camofox-browser:latest
+    platform: linux/amd64
     ports:
-      - "9377:9377"
+      - "127.0.0.1:9377:9377"
+      - "127.0.0.1:6080:6080"
+    environment:
+      - CAMOFOX_HOST=0.0.0.0
+      - CAMOFOX_API_KEY=${CAMOFOX_API_KEY}
+      - CAMOFOX_VNC_TIMEOUT_MS=86400000
+      - CAMOFOX_VNC_RESOLUTION=1280x720x24
+      - CAMOFOX_SCREEN_WIDTH=1280
+      - CAMOFOX_SCREEN_HEIGHT=720
+      - HANDLER_TIMEOUT_MS=120000
+      - CAMOFOX_TAB_LOCK_TIMEOUT_MS=120000
+    volumes:
+      - camofox-browser-profiles:/home/node/.camofox/profiles
     healthcheck:
       # CamoFox browser exposes a simple health endpoint at /health.
       # This healthcheck uses curl (more common than wget). If your image lacks curl,
@@ -20,9 +33,14 @@ services:
   camofox-mcp:
     profiles: ["mcp"]
     image: ghcr.io/redf0x1/camofox-mcp:latest
+    platform: linux/amd64
     environment:
       - CAMOFOX_URL=http://camofox-browser:9377
+      - CAMOFOX_API_KEY=${CAMOFOX_API_KEY}
     depends_on:
       camofox-browser:
         condition: service_healthy
     stdin_open: true
+
+volumes:
+  camofox-browser-profiles:
