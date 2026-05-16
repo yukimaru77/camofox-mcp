@@ -15,6 +15,8 @@ export CAMOFOX_SCREEN_HEIGHT="${CAMOFOX_SCREEN_HEIGHT:-720}"
 export HANDLER_TIMEOUT_MS="${HANDLER_TIMEOUT_MS:-120000}"
 export CAMOFOX_TAB_LOCK_TIMEOUT_MS="${CAMOFOX_TAB_LOCK_TIMEOUT_MS:-120000}"
 
+mkdir -p "$CAMOFOX_PROFILES_DIR" "$HOME/.camofox-native/logs"
+
 visible_desktop="${CAMOFOX_VISIBLE_DESKTOP:-true}"
 uid="$(id -u)"
 
@@ -29,7 +31,12 @@ if [[ "$visible_desktop" != "false" && "$visible_desktop" != "0" ]]; then
   if [[ -n "${DISPLAY:-}" ]]; then
     export CAMOFOX_HEADLESS="${CAMOFOX_HEADLESS:-false}"
   fi
+
+  if [[ -n "${DISPLAY:-}" ]] && [[ -x "$repo_dir/scripts/camofox-input-shield.sh" ]]; then
+    if ! pgrep -f "$repo_dir/scripts/camofox-input-shield.py" >/dev/null 2>&1; then
+      nohup "$repo_dir/scripts/camofox-input-shield.sh" >>"$HOME/.camofox-native/logs/input-shield.log" 2>&1 &
+    fi
+  fi
 fi
 
-mkdir -p "$CAMOFOX_PROFILES_DIR" "$HOME/.camofox-native/logs"
 exec node "$HOME/.camofox-native/pkg/node_modules/camofox-browser/dist/src/server.js"
