@@ -33,9 +33,7 @@ if [[ "$visible_desktop" != "false" && "$visible_desktop" != "0" ]]; then
   fi
 
   if [[ -n "${DISPLAY:-}" ]] && [[ -x "$repo_dir/scripts/camofox-input-shield.sh" ]]; then
-    if ! pgrep -f "$repo_dir/scripts/camofox-input-shield.py" >/dev/null 2>&1; then
-      nohup "$repo_dir/scripts/camofox-input-shield.sh" >>"$HOME/.camofox-native/logs/input-shield.log" 2>&1 &
-    fi
+    "$repo_dir/scripts/camofox-input-shield.sh" on >/dev/null 2>&1 || true
   fi
 fi
 

@@ -69,6 +69,22 @@ Configure your HTTP MCP client to connect to `http://localhost:3000/mcp` with
 
 Full client configuration examples live in [docs/getting-started.md](docs/getting-started.md).
 
+## Local Visible Desktop Helpers
+
+This fork includes local helper scripts for running Camofox visibly on a GNOME/X11 desktop and shielding the browser from physical mouse hover/click interference.
+
+- Visible native launcher: `scripts/camofox-browser-native.sh`
+- Input shield control: `scripts/camofox-input-shield.sh on|off|toggle|status`
+- Shortcut installer: `scripts/camofox-input-shield.sh install-shortcuts`
+
+Default shortcuts after installation:
+
+- `Ctrl+Alt+I`: toggle the input shield
+- `Ctrl+Alt+Shift+I`: disable/remove the input shield
+- `Ctrl+Alt+Super+I`: enable/restore the input shield
+
+See [Local Visible Camofox](docs/local-visible-camofox.md) for details.
+
 ## Quick Verify
 
 Verify the browser server is reachable:
