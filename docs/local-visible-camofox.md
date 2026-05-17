@@ -8,7 +8,7 @@ The input shield is an invisible X11 `InputOnly` overlay above the visible Camou
 
 Agent actions still work because Camofox sends them through the browser automation protocol.
 
-The shield process also minimizes the blank startup window titled `Camoufox` when a real page window such as `ChatGPT - Camoufox` is open. This keeps the desktop focused on the useful browser window.
+The shield process also closes the blank startup window titled `Camoufox` when a real page window such as `ChatGPT - Camoufox` is open. If closing fails, it falls back to minimizing that blank window. This keeps the desktop focused on the useful browser window.
 
 ## Commands
 

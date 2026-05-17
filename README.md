@@ -74,8 +74,17 @@ Full client configuration examples live in [docs/getting-started.md](docs/gettin
 This fork includes local helper scripts for running Camofox visibly on a GNOME/X11 desktop and shielding the browser from physical mouse hover/click interference.
 
 - Visible native launcher: `scripts/camofox-browser-native.sh`
+- Native MCP launcher: `scripts/camofox-mcp-native.sh`
 - Input shield control: `scripts/camofox-input-shield.sh on|off|toggle|status`
 - Shortcut installer: `scripts/camofox-input-shield.sh install-shortcuts`
+- ChatGPT response status helper: `scripts/chatgpt-response-status.sh [tabId]`
+
+Local defaults in this fork:
+
+- `scripts/camofox-browser-native.sh` reads `CAMOFOX_API_KEY` from local `.env` when present, listens on `127.0.0.1:9377`, stores native profiles under `$HOME/.camofox-native/profiles`, and uses longer one-day session/idle/VNC timeouts for persistent visible sessions.
+- On GNOME/X11 it normalizes `DISPLAY`/`XAUTHORITY`, sets `CAMOFOX_HEADLESS=false`, and starts the input shield automatically unless `CAMOFOX_VISIBLE_DESKTOP=false`.
+- `scripts/camofox-mcp-native.sh` health-checks the browser server, starts the native browser if needed, waits for it to become ready, then runs `camofox-mcp`.
+- The input shield creates an invisible X11 overlay above the active Camoufox window. It absorbs physical mouse/key events while preserving automation-protocol actions, and it closes the blank startup window titled `Camoufox` when a real page window is open. If closing fails, it falls back to minimizing that blank window.
 
 Default shortcuts after installation:
 

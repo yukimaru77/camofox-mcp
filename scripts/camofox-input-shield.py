@@ -63,7 +63,7 @@ def find_camoufox_window() -> str | None:
     return max(matches)[1]
 
 
-def minimize_blank_camoufox_windows() -> None:
+def close_blank_camoufox_windows() -> None:
     has_content_window = any(
         ("— Camoufox" in title or "- Camoufox" in title) and title.strip() != "Camoufox"
         for _, title in wmctrl_windows()
@@ -74,9 +74,12 @@ def minimize_blank_camoufox_windows() -> None:
     for window_id, title in wmctrl_windows():
         if title.strip() == "Camoufox":
             try:
-                run_x(["xdotool", "windowminimize", window_id])
+                run_x(["wmctrl", "-i", "-c", window_id])
             except Exception:
-                pass
+                try:
+                    run_x(["xdotool", "windowminimize", window_id])
+                except Exception:
+                    pass
 
 
 def window_geometry(window_id: str) -> tuple[int, int, int, int] | None:
@@ -138,7 +141,7 @@ def main() -> int:
     last_geometry: tuple[int, int, int, int] | None = None
 
     while True:
-        minimize_blank_camoufox_windows()
+        close_blank_camoufox_windows()
         window_id = find_camoufox_window()
         geometry = window_geometry(window_id) if window_id else None
         if geometry is None:
