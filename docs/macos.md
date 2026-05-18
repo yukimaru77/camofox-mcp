@@ -102,6 +102,39 @@ reports Windows, which is also a sensible default for anti-detection work
 since most real users browse from Windows. Override with `CAMOFOX_OS=linux`
 (or `macos` if a future version's dataset adds support).
 
+### CJK rendering (Japanese / Korean / Chinese)
+
+With `CAMOFOX_OS=windows`, Camoufox writes a `font.system.whitelist` pref
+containing only Windows font names (Yu Gothic, MS UI Gothic, ...). On macOS
+none of those fonts exist, so any CSS that names them falls through to a
+fallback that lacks CJK glyphs → 文字化け.
+
+Two steps fix this:
+
+1. **Patch camoufox-js's font list** so the runtime whitelist also allows the
+   macOS Hiragino / PingFang / Apple Gothic families. Camoufox-browser has
+   no API to pass extra fonts, so this is done by an in-place edit of
+   `camoufox-js/dist/mappings/fonts.config.js`:
+
+   ```bash
+   node ~/camofox-mcp/scripts/macos/patch-camoufox-fonts.mjs
+   ```
+
+   The patch is idempotent and tolerates re-runs after `npm install`.
+
+2. **Pin per-language default font** in the persistent profile so pages that
+   ask for "sans-serif" / "serif" / "monospace" generic families get a real
+   macOS Japanese font instead of an unsatisfiable Windows name. Copy the
+   template `user.js` into the profile directory:
+
+   ```bash
+   cp ~/camofox-mcp/scripts/macos/profile-user.js \
+      ~/.camofox-native/profiles/default/user.js
+   ```
+
+   Restart the browser (kill `~/.camofox-native/browser.pid`; the next MCP
+   call will re-launch it via the launcher).
+
 ### Fixed screen size disabled
 
 The fork's Linux launcher pins `CAMOFOX_SCREEN_WIDTH=1280`/`HEIGHT=720` to
