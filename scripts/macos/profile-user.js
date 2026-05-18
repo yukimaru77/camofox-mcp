@@ -1,40 +1,40 @@
-// Template user.js for the Camoufox persistent profile on macOS.
-//
-// Copy this file to $CAMOFOX_PROFILES_DIR/<userId>/user.js (e.g.
-// ~/.camofox-native/profiles/default/user.js). Firefox/Camoufox loads
-// user.js on every launch, so values here override any matching pref
-// Camoufox wrote into prefs.js.
-//
-// Why this file exists: Camoufox spoofs the JS-reported font list to
-// Windows names (Yu Gothic, MS UI Gothic, ...). Those fonts do not exist
-// on macOS, so any CSS `font-family:` that names them falls through to a
-// renderer fallback whose default does not include any CJK glyphs ->
-// Japanese, Korean, and Chinese render as 文字化け (mojibake). The prefs
-// below pin the per-language default to the macOS Hiragino / PingFang /
-// Apple Gothic families, which actually exist on the system.
-//
-// Note: the font.system.whitelist override is intentionally non-empty —
-// Camoufox re-applies a Windows-only whitelist at runtime, so even if we
-// set this to "" here it is overwritten. The whitelist is instead extended
-// at the camoufox-js layer by scripts/macos/patch-camoufox-fonts.mjs.
+// camofox-mcp macOS: force the Japanese font fallback to the macOS Hiragino
+// family. Camoufox spoofs the JS-reported font list to Windows names
+// (MS UI Gothic / Yu Gothic / ...), and those fonts do not exist on macOS,
+// so any page CSS that requests them ends up in a fallback chain whose
+// default does not support CJK -> 文字化け. These prefs override the
+// fallback at the renderer level (independent of the spoofed font list)
+// so Japanese text always picks a real macOS font.
 
-// Japanese (ja).
+// Camoufox sets font.system.whitelist to a Windows-only font list, which
+// hides the macOS Hiragino family from the *renderer* itself (not just JS).
+// Empty whitelist = no restriction; the renderer sees all installed system
+// fonts and can use Hiragino for the prefs below.
+user_pref("font.system.whitelist", "");
 user_pref("font.name.serif.ja", "Hiragino Mincho ProN");
 user_pref("font.name.sans-serif.ja", "Hiragino Sans");
 user_pref("font.name.monospace.ja", "Osaka-Mono");
 user_pref("font.default.ja", "sans-serif");
 
-// Korean (ko).
+// Force any new top-level page to open as a tab inside the existing
+// Camoufox window instead of as a separate OS window. Playwright's
+// context.newPage() — which camofox-browser uses on POST /tabs — would
+// otherwise spawn a fresh BrowserWindow each call, which is visually
+// disruptive when running parallel MCP requests.
+//   3 = open new windows in a new tab instead
+//   0 (restriction) = the above applies to every window.open / new page,
+//                     not only target=_blank links.
+user_pref("browser.link.open_newwindow", 3);
+user_pref("browser.link.open_newwindow.restriction", 0);
+
+// Same for Korean / Simplified Chinese / Traditional Chinese, since the
+// spoofed list includes "Malgun Gothic" etc. that also don't exist on macOS.
 user_pref("font.name.serif.ko", "AppleMyungjo");
 user_pref("font.name.sans-serif.ko", "Apple SD Gothic Neo");
 user_pref("font.default.ko", "sans-serif");
-
-// Simplified Chinese (zh-CN).
 user_pref("font.name.serif.zh-CN", "STSong");
 user_pref("font.name.sans-serif.zh-CN", "PingFang SC");
 user_pref("font.default.zh-CN", "sans-serif");
-
-// Traditional Chinese (zh-TW).
 user_pref("font.name.serif.zh-TW", "LiSong Pro");
 user_pref("font.name.sans-serif.zh-TW", "PingFang TC");
 user_pref("font.default.zh-TW", "sans-serif");
