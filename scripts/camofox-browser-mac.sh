@@ -23,6 +23,13 @@ export CAMOFOX_PROFILES_DIR="${CAMOFOX_PROFILES_DIR:-$HOME/.camofox-native/profi
 # screen for the chosen fingerprint OS (forcing 1280x720 caused
 # "No headers can be generated" with CAMOFOX_OS=windows).
 export HANDLER_TIMEOUT_MS="${HANDLER_TIMEOUT_MS:-120000}"
+
+# Default evaluate-extended rate limit is 20 req/min/user, which is too
+# tight for polling-heavy MCP clients (e.g. chatgpt-pro-mcp polling
+# location.href every 500ms while waiting for a ChatGPT conversation to
+# spin up). Raise it for loopback / single-user setups.
+export CAMOFOX_EVAL_EXTENDED_RATE_LIMIT_MAX="${CAMOFOX_EVAL_EXTENDED_RATE_LIMIT_MAX:-1000}"
+export CAMOFOX_EVAL_EXTENDED_RATE_LIMIT_WINDOW_MS="${CAMOFOX_EVAL_EXTENDED_RATE_LIMIT_WINDOW_MS:-60000}"
 export CAMOFOX_TAB_LOCK_TIMEOUT_MS="${CAMOFOX_TAB_LOCK_TIMEOUT_MS:-120000}"
 export CAMOFOX_SESSION_TIMEOUT="${CAMOFOX_SESSION_TIMEOUT:-86400000}"
 export CAMOFOX_IDLE_TIMEOUT_MS="${CAMOFOX_IDLE_TIMEOUT_MS:-86400000}"
